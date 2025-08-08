@@ -4,25 +4,18 @@
   "private": true,
   "scripts": {
     "dev": "tsx watch server.ts",
-    "build-server": "tsc --project tsconfig.server.json",
-    "build-next": "next build",
-    "build": "npm run build-server && npm run build-next",
-    "start-server": "node dist/server.js",
-    "start-next": "next start",
-    "start": "npm run start-server & npm run start-next"
+    "build": "tsc --project tsconfig.server.json",
+    "start": "node dist/server.js"
   },
   "dependencies": {
     "@genkit-ai/googleai": "^1.16.0",
-    "clsx": "^2.1.1",
     "cors": "^2.8.5",
     "dotenv": "^16.6.1",
     "express": "^4.21.2",
     "firebase": "^12.1.0",
     "genkit": "^1.16.0",
-    "next": "^15.4.6",
     "razorpay": "^2.9.6",
     "socket.io": "^4.8.1",
-    "tailwind-merge": "^3.3.1",
     "zod": "^3.25.76"
   },
   "devDependencies": {
@@ -31,7 +24,6 @@
     "@types/firebase": "^2.4.32",
     "@types/node": "^20.19.10",
     "@types/socket.io": "^3.0.1",
-    "concurrently": "^9.2.0",
     "nodemon": "^3.1.10",
     "ts-node": "^10.9.2",
     "tsx": "^4.15.7",
