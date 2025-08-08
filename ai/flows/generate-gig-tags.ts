@@ -8,19 +8,19 @@
  * - GenerateGigTagsOutput - The return type for the generateGigTags function.
  */
 
-import {ai} from '../genkit';
-import {z} from 'genkit';
+import { ai } from '../genkit';
+import { z } from 'zod';  // fix import here
 
 const GenerateGigTagsInputSchema = z.object({
   title: z.string().describe('The title of the gig.'),
   description: z.string().describe('The description of the gig.'),
 });
-export type GenerateGigTagsInput = z.infer<typeof GenerateGigTagsInputSchema>;
+export type GenerateGigTagsInput = z.infer<typeof GenerateGigTagsInputSchema>;  // fix here
 
 const GenerateGigTagsOutputSchema = z.object({
   tags: z.array(z.string()).describe('An array of tags generated for the gig.'),
 });
-export type GenerateGigTagsOutput = z.infer<typeof GenerateGigTagsOutputSchema>;
+export type GenerateGigTagsOutput = z.infer<typeof GenerateGigTagsOutputSchema>;  // fix here
 
 export async function generateGigTags(input: GenerateGigTagsInput): Promise<GenerateGigTagsOutput> {
   return generateGigTagsFlow(input);
@@ -28,18 +28,18 @@ export async function generateGigTags(input: GenerateGigTagsInput): Promise<Gene
 
 const prompt = ai.definePrompt({
   name: 'generateGigTagsPrompt',
-  input: {schema: GenerateGigTagsInputSchema},
-  output: {schema: GenerateGigTagsOutputSchema},
+  input: { schema: GenerateGigTagsInputSchema },
+  output: { schema: GenerateGigTagsOutputSchema },
   prompt: `You are an expert at generating relevant tags for online service gigs.
 
-  Given the title and description of a gig, generate a list of tags that will help the gig be discovered by potential customers.
-  The tags should be relevant to the gig and should be specific enough to attract the right customers.
-  Return no more than 10 tags.
+Given the title and description of a gig, generate a list of tags that will help the gig be discovered by potential customers.
+The tags should be relevant to the gig and should be specific enough to attract the right customers.
+Return no more than 10 tags.
 
-  Title: {{{title}}}
-  Description: {{{description}}}
+Title: {{{title}}}
+Description: {{{description}}}
 
-  Tags:`,
+Tags:`,
 });
 
 const generateGigTagsFlow = ai.defineFlow(
@@ -48,8 +48,8 @@ const generateGigTagsFlow = ai.defineFlow(
     inputSchema: GenerateGigTagsInputSchema,
     outputSchema: GenerateGigTagsOutputSchema,
   },
-  async input => {
-    const {output} = await prompt(input);
+  async (input: GenerateGigTagsInput) => {  // explicit input typing
+    const { output } = await prompt(input);
     return output!;
   }
 );

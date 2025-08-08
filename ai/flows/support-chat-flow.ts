@@ -1,4 +1,3 @@
-
 'use server';
 
 /**
@@ -9,43 +8,43 @@
  * - SupportChatOutput - The return type for the supportChat function.
  */
 
-import {ai} from '../genkit';
-import {z} from 'genkit';
+import { ai } from '../genkit';
+import { z } from 'zod';  // <--- fixed here
 
 const SupportChatInputSchema = z.object({
-  history: z.array(z.object({
-    role: z.enum(['user', 'model']),
-    content: z.string(),
-  })).describe('The conversation history between the user and the AI.'),
+  history: z.array(
+    z.object({
+      role: z.enum(['user', 'model']),
+      content: z.string(),
+    })
+  ).describe('The conversation history between the user and the AI.'),
 });
-export type SupportChatInput = z.infer<typeof SupportChatInputSchema>;
+export type SupportChatInput = z.infer<typeof SupportChatInputSchema>;  // fixed import source
 
 const SupportChatOutputSchema = z.object({
   response: z.string().describe('The AI-generated response to the user.'),
 });
-export type SupportChatOutput = z.infer<typeof SupportChatOutputSchema>;
-
+export type SupportChatOutput = z.infer<typeof SupportChatOutputSchema>;  // fixed import source
 
 export async function supportChat(input: SupportChatInput): Promise<SupportChatOutput> {
   return supportChatFlow(input);
 }
 
 const prompt = ai.definePrompt({
-    name: 'supportChatPrompt',
-    input: {schema: SupportChatInputSchema},
-    output: {schema: SupportChatOutputSchema},
-    prompt: `You are a friendly and helpful support agent for GigLink, a marketplace for freelance services. 
-    Your goal is to assist users by answering their questions and resolving their doubts about the platform.
-    Be concise and clear in your responses.
+  name: 'supportChatPrompt',
+  input: { schema: SupportChatInputSchema },
+  output: { schema: SupportChatOutputSchema },
+  prompt: `You are a friendly and helpful support agent for GigLink, a marketplace for freelance services. 
+Your goal is to assist users by answering their questions and resolving their doubts about the platform.
+Be concise and clear in your responses.
 
-    Conversation History:
-    {{#each history}}
-      **{{role}}**: {{{content}}}
-    {{/each}}
-    
-    **model**:`,
+Conversation History:
+{{#each history}}
+  **{{role}}**: {{{content}}}
+{{/each}}
+
+**model**:`,
 });
-
 
 const supportChatFlow = ai.defineFlow(
   {
@@ -53,8 +52,9 @@ const supportChatFlow = ai.defineFlow(
     inputSchema: SupportChatInputSchema,
     outputSchema: SupportChatOutputSchema,
   },
-  async input => {
-    const {output} = await prompt(input);
+  async (input: SupportChatInput) => {  // added explicit type here
+    const { output } = await prompt(input);
     return { response: output!.response };
   }
 );
+

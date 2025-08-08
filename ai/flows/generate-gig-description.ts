@@ -1,4 +1,3 @@
-
 'use server';
 
 /**
@@ -9,8 +8,8 @@
  * - GenerateGigDescriptionOutput - The return type for the function.
  */
 
-import {ai} from '../genkit';
-import {z} from 'genkit';
+import { ai } from '../genkit';
+import { z } from 'zod';  // Fix import here
 
 const GenerateGigDescriptionInputSchema = z.object({
   title: z.string().describe('The title of the gig.'),
@@ -23,14 +22,16 @@ const GenerateGigDescriptionOutputSchema = z.object({
 });
 export type GenerateGigDescriptionOutput = z.infer<typeof GenerateGigDescriptionOutputSchema>;
 
-export async function generateGigDescription(input: GenerateGigDescriptionInput): Promise<GenerateGigDescriptionOutput> {
+export async function generateGigDescription(
+  input: GenerateGigDescriptionInput
+): Promise<GenerateGigDescriptionOutput> {
   return generateGigDescriptionFlow(input);
 }
 
 const prompt = ai.definePrompt({
   name: 'generateGigDescriptionPrompt',
-  input: {schema: GenerateGigDescriptionInputSchema},
-  output: {schema: GenerateGigDescriptionOutputSchema},
+  input: { schema: GenerateGigDescriptionInputSchema },
+  output: { schema: GenerateGigDescriptionOutputSchema },
   prompt: `You are an expert copywriter specializing in creating compelling gig descriptions for a freelance marketplace called GigLink.
 
   Given the gig title and a list of keywords, write a professional, engaging, and detailed description for the service. 
@@ -50,8 +51,8 @@ const generateGigDescriptionFlow = ai.defineFlow(
     inputSchema: GenerateGigDescriptionInputSchema,
     outputSchema: GenerateGigDescriptionOutputSchema,
   },
-  async input => {
-    const {output} = await prompt(input);
+  async (input: GenerateGigDescriptionInput) => {  // Explicitly type input here
+    const { output } = await prompt(input);
     return output!;
   }
 );

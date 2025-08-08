@@ -30,7 +30,7 @@ const appExpress = express();
 appExpress.use(express.json());
 appExpress.use(
   cors({
-    origin: ['http://localhost:3000', 'http://localhost:3001'],
+    origin: ['https://freelancer-client-yytn.vercel.app/', 'http://localhost:3001'],
     credentials: true,
   })
 );
@@ -144,7 +144,7 @@ appExpress.get('/api/health', (req, res) => {
 
 // Start Express API on port 4000
 appExpress.listen(4000, () => {
-  console.log('Express API server running on http://localhost:4000');
+  console.log('Express API server running on https://freelancer-server-9l9n.onrender.com');
 });
 
 app.prepare().then(() => {
@@ -157,7 +157,7 @@ app.prepare().then(() => {
     path: '/api/socket',
     addTrailingSlash: false,
     cors: {
-      origin: ['http://localhost:3000', 'http://localhost:3001'],
+      origin: ['https://freelancer-client-yytn.vercel.app/', 'http://localhost:3001'],
       methods: ['GET', 'POST'],
       credentials: true,
     },

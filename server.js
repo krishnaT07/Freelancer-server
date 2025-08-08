@@ -56,7 +56,7 @@ var appExpress = express();
 // Middleware
 appExpress.use(express.json());
 appExpress.use(cors({
-    origin: ['http://localhost:3000', 'http://localhost:3001'], // Allow frontend origins
+    origin: ['https://freelancer-client-yytn.vercel.app/', 'http://localhost:3001'], // Allow frontend origins
     credentials: true
 }));
 // Razorpay configuration
@@ -237,7 +237,7 @@ appExpress.get('/api/health', function (req, res) {
 });
 // Start Express API server on port 4000
 appExpress.listen(4000, function () {
-    console.log('Express API server running on http://localhost:5000');
+    console.log('Express API server running on https://freelancer-server-9l9n.onrender.com');
 });
 // Next.js server setup
 app.prepare().then(function () {
@@ -250,7 +250,7 @@ app.prepare().then(function () {
         path: '/api/socket',
         addTrailingSlash: false,
         cors: {
-            origin: ['http://localhost:3000', 'http://localhost:3001'],
+            origin: ['https://freelancer-client-yytn.vercel.app/', 'http://localhost:3001'],
             methods: ['GET', 'POST'],
             credentials: true
         }
