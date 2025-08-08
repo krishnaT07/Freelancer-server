@@ -4,8 +4,12 @@
   "private": true,
   "scripts": {
     "dev": "tsx watch server.ts",
-    "build": "tsc --project tsconfig.server.json",
-    "start": "node dist/server.js"
+    "build-server": "tsc --project tsconfig.server.json",
+    "build-next": "next build",
+    "build": "npm run build-server && npm run build-next",
+    "start-server": "node dist/server.js",
+    "start-next": "next start",
+    "start": "npm run start-server & npm run start-next"
   },
   "dependencies": {
     "@genkit-ai/googleai": "^1.16.0",
@@ -27,6 +31,7 @@
     "@types/firebase": "^2.4.32",
     "@types/node": "^20.19.10",
     "@types/socket.io": "^3.0.1",
+    "concurrently": "^9.2.0",
     "nodemon": "^3.1.10",
     "ts-node": "^10.9.2",
     "tsx": "^4.15.7",
