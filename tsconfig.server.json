@@ -9,7 +9,7 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "resolveJsonModule": true,
-    "types": ["node", "express", "cors", "socket.io", "firebase"]
+    "types": ["node"]
   },
   "include": ["server.ts", "ai/**/*.ts", "lib/**/*.ts", "declaration.d.ts"],
   "exclude": ["node_modules"]
