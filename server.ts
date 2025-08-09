@@ -1,11 +1,9 @@
 import express from 'express';
-import next from 'next';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 import cors from 'cors';
 import crypto from 'crypto';
 import Razorpay from 'razorpay';
-import { parse } from 'url';
 
 import type { Message } from './lib/types';
 import {
@@ -17,21 +15,14 @@ import {
   translateTextAction,
 } from './actions';
 
-const dev = process.env.NODE_ENV !== 'production';
-const hostname = process.env.HOST || 'localhost';
 const port = parseInt(process.env.PORT || '3000', 10);
 
-const app = next({ dev, hostname, port });
-const handle = app.getRequestHandler();
-
 async function main() {
-  await app.prepare();
+  const app = express();
 
-  const server = express();
-
-  // Middleware for Express API
-  server.use(express.json());
-  server.use(
+  // Middleware
+  app.use(express.json());
+  app.use(
     cors({
       origin: [
         'https://freelancer-client-yytn.vercel.app',
@@ -41,16 +32,14 @@ async function main() {
     })
   );
 
-  // Razorpay config
+  // Razorpay instance
   const razorpay = new Razorpay({
     key_id: process.env.RAZORPAY_KEY_ID || 'YOUR_KEY_ID',
     key_secret: process.env.RAZORPAY_KEY_SECRET || 'YOUR_KEY_SECRET',
   });
 
-  // API routes under /api
-  const apiRouter = express.Router();
-
-  apiRouter.post('/razorpay/order', async (req, res) => {
+  // API routes
+  app.post('/api/razorpay/order', async (req, res) => {
     try {
       const { amount, currency } = req.body;
       const options = {
@@ -66,7 +55,7 @@ async function main() {
     }
   });
 
-  apiRouter.post('/razorpay/verify', (req, res) => {
+  app.post('/api/razorpay/verify', (req, res) => {
     try {
       const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
       const key_secret = process.env.RAZORPAY_KEY_SECRET || 'YOUR_KEY_SECRET';
@@ -85,7 +74,7 @@ async function main() {
     }
   });
 
-  apiRouter.post('/generate-tags', async (req, res) => {
+  app.post('/api/generate-tags', async (req, res) => {
     try {
       const result = await generateTagsAction(req.body);
       res.json({ tags: result });
@@ -95,7 +84,7 @@ async function main() {
     }
   });
 
-  apiRouter.post('/generate-description', async (req, res) => {
+  app.post('/api/generate-description', async (req, res) => {
     try {
       const result = await generateDescriptionAction(req.body);
       res.json({ description: result });
@@ -105,7 +94,7 @@ async function main() {
     }
   });
 
-  apiRouter.post('/generate-image', async (req, res) => {
+  app.post('/api/generate-image', async (req, res) => {
     try {
       const result = await generateImageAction(req.body.title);
       res.json({ imageDataUri: result });
@@ -115,7 +104,7 @@ async function main() {
     }
   });
 
-  apiRouter.post('/support-chat', async (req, res) => {
+  app.post('/api/support-chat', async (req, res) => {
     try {
       const result = await supportChatAction(req.body);
       res.json({ response: result });
@@ -125,7 +114,7 @@ async function main() {
     }
   });
 
-  apiRouter.post('/recommend-gigs', async (req, res) => {
+  app.post('/api/recommend-gigs', async (req, res) => {
     try {
       const result = await recommendGigsAction(req.body);
       res.json({ recommendations: result });
@@ -135,7 +124,7 @@ async function main() {
     }
   });
 
-  apiRouter.post('/translate-text', async (req, res) => {
+  app.post('/api/translate-text', async (req, res) => {
     try {
       const result = await translateTextAction(req.body);
       res.json({ translation: result });
@@ -145,22 +134,14 @@ async function main() {
     }
   });
 
-  apiRouter.get('/health', (req, res) => {
+  app.get('/api/health', (req, res) => {
     res.json({ status: 'ok', message: 'Server is running' });
   });
 
-  // Mount apiRouter under /api path
-  server.use('/api', apiRouter);
+  // Create HTTP server (for socket.io)
+  const httpServer = createServer(app);
 
-  // Handle Next.js requests
-  server.all('*', (req, res) => {
-    return handle(req, res);
-  });
-
-  // Create HTTP server for socket.io
-  const httpServer = createServer(server);
-
-  // Setup socket.io on same server
+  // Setup Socket.io server
   const io = new Server(httpServer, {
     path: '/api/socket',
     cors: {
@@ -174,7 +155,7 @@ async function main() {
   });
 
   io.on('connection', (socket) => {
-    console.log('A user connected:', socket.id);
+    console.log('User connected:', socket.id);
 
     socket.on('joinConversation', (conversationId) => {
       socket.join(conversationId);
@@ -191,12 +172,14 @@ async function main() {
     });
   });
 
+  // Start server
   httpServer.listen(port, () => {
-    console.log(`> Server ready on http://${hostname}:${port}`);
+    console.log(`Server listening on http://localhost:${port}`);
   });
 }
 
-main().catch((err) => {
-  console.error(err);
+main().catch((error) => {
+  console.error('Fatal error starting server:', error);
   process.exit(1);
 });
+
