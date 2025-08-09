@@ -1,16 +1,11 @@
 {
   "compilerOptions": {
-    "target": "ES2017",
-    "module": "commonjs",
-    "moduleResolution": "node",
-    "lib": ["esnext"],
-    "outDir": "./dist",
+    "target": "ESNext",
+    "module": "CommonJS",
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "resolveJsonModule": true,
     "types": ["node"]
   },
-  "include": ["server.ts", "ai/**/*.ts", "lib/**/*.ts", "declaration.d.ts"],
-  "exclude": ["node_modules"]
+  "include": ["server.ts", "lib/**/*.ts"]
 }
